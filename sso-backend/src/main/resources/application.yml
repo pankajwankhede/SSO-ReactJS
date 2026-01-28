@@ -1,0 +1,61 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        name: JSESSIONID
+        http-only: true
+        secure: true
+        same-site: none
+
+spring:
+  application:
+    name: sso-backend
+  # To run without a Geode locator in local dev, set env:
+  #   SPRING_SESSION_STORE_TYPE=none
+  session:
+    store-type: geode
+
+  data:
+    geode:
+      # Update locators for your env
+      pool:
+        default:
+          locators: localhost[10334]
+      cache:
+        log-level: info
+
+sso:
+  # Feature flags per realm: IHH disables forgot flows.
+  realms:
+    BCC:
+      forgot-username: true
+      forgot-password: true
+    PCC:
+      forgot-username: true
+      forgot-password: true
+    RCC:
+      forgot-username: true
+      forgot-password: true
+    TTM:
+      forgot-username: true
+      forgot-password: true
+    IHH:
+      forgot-username: false
+      forgot-password: false
+
+  # Directional sharing: target realm trusts allowFrom realms.
+  sessionSharing:
+    BCC:
+      allowFrom: [PCC, RCC]
+    PCC:
+      allowFrom: [BCC]
+    RCC:
+      allowFrom: [BCC]
+    IHH:
+      allowFrom: []
+
+  cors:
+    allowed-origins:
+      - https://ssologinui.company.com
