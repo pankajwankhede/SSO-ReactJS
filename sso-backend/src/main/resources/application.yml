@@ -46,15 +46,18 @@ sso:
       forgot-password: false
 
   # Directional sharing: target realm trusts allowFrom realms.
+sso:
   sessionSharing:
-    BCC:
-      allowFrom: [PCC, RCC]
-    PCC:
-      allowFrom: [BCC]
-    RCC:
-      allowFrom: [BCC]
-    IHH:
-      allowFrom: []
+    rules:
+      BCC:
+        allowFrom: [PCC, RCC]
+      PCC:
+        allowFrom: [BCC]
+      RCC:
+        allowFrom: [BCC]
+      IHH:
+        allowFrom: []
+
 
   cors:
     allowed-origins:
