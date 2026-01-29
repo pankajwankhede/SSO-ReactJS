@@ -1,28 +1,3 @@
-server:
-  port: 8080
-  servlet:
-    session:
-      timeout: 30m
-      cookie:
-        name: JSESSIONID
-        http-only: true
-        secure: true
-        same-site: none
-
-spring:
-  application:
-    name: sso-backend
-  session:
-    store-type: geode
-
-  data:
-    geode:
-      pool:
-        default:
-          locators: localhost[10334]
-      cache:
-        log-level: info
-
 sso:
   realms:
     BCC:
@@ -51,11 +26,3 @@ sso:
         allowFrom: [BCC]
       IHH:
         allowFrom: []
-
-  cors:
-    allowed-origins:
-      - https://ssologinui.company.com
-logging:
-  level:
-    org.springframework.boot.context.properties: TRACE
-    org.springframework.core.env: DEBUG
