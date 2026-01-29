@@ -12,14 +12,11 @@ server:
 spring:
   application:
     name: sso-backend
-  # To run without a Geode locator in local dev, set env:
-  #   SPRING_SESSION_STORE_TYPE=none
   session:
     store-type: geode
 
   data:
     geode:
-      # Update locators for your env
       pool:
         default:
           locators: localhost[10334]
@@ -27,7 +24,6 @@ spring:
         log-level: info
 
 sso:
-  # Feature flags per realm: IHH disables forgot flows.
   realms:
     BCC:
       forgot-username: true
@@ -45,8 +41,6 @@ sso:
       forgot-username: false
       forgot-password: false
 
-  # Directional sharing: target realm trusts allowFrom realms.
-sso:
   sessionSharing:
     rules:
       BCC:
@@ -58,7 +52,10 @@ sso:
       IHH:
         allowFrom: []
 
-
   cors:
     allowed-origins:
       - https://ssologinui.company.com
+logging:
+  level:
+    org.springframework.boot.context.properties: TRACE
+    org.springframework.core.env: DEBUG
