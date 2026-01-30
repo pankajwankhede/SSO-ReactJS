@@ -11,6 +11,64 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
+/*
+ ============================================================================
+  Scenario: Multi-tab, multi-realm session sharing (PCC → BCC/RCC)
+
+  1) User logs in on PCC tab
+     --------------------------------
+     - Browser receives ONE JSESSIONID cookie
+     - HttpSession is created (or reused)
+     - Backend stores:
+         CHANNEL_USER_MAP["PCC"] = ChannelUserDetails(userA)
+
+  2) User opens a new tab for BCC
+     --------------------------------
+     Request:
+       GET /ssoauthenticate?real=BCC&clientID=...
+
+     - BCC realm is NOT present in CHANNEL_USER_MAP
+     - LOGOUT_BLOCK_MAP["BCC"] is NOT set
+     - sessionSharing rules:
+         sso.sessionSharing.rules.BCC.allowFrom = [PCC, RCC]
+
+     - Backend finds PCC session already exists
+     - Auto-login happens via sharing:
+         CHANNEL_USER_MAP["BCC"] = ChannelUserDetails(userA)
+         attributes:
+           autoLogin = true
+           sharedFrom = "PCC"
+
+     - User is NOT asked for credentials
+     - Authorization code is generated and returned
+
+  3) User logs out from BCC tab (Option B behavior)
+     --------------------------------
+     - Backend removes:
+         CHANNEL_USER_MAP["BCC"]
+     - Backend sets:
+         LOGOUT_BLOCK_MAP["BCC"] = true
+
+     - PCC session REMAINS ACTIVE:
+         CHANNEL_USER_MAP["PCC"] is untouched
+
+  4) User opens BCC again while PCC is still logged in
+     --------------------------------
+     - Backend sees:
+         LOGOUT_BLOCK_MAP["BCC"] = true
+     - Auto-login via sharing is BLOCKED
+     - Login screen is shown for BCC
+     - User must manually authenticate for BCC again
+
+  5) Session cleanup rule
+     --------------------------------
+     - If a logout removes the LAST realm session
+       (CHANNEL_USER_MAP becomes empty)
+     - HttpSession is invalidated to clean up
+ ============================================================================
+*/
+
+
 @Service
 public class SessionSharingService {
 
